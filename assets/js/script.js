@@ -202,6 +202,70 @@ checks.forEach((c) => c.addEventListener("change", updateChecklist));
 updateChecklist();
 
 // ============================================================
+// Feed do Instagram (automático, via função /api/instagram no Vercel)
+// ============================================================
+const INSTAGRAM_URL = "https://www.instagram.com/lisianesedrezadvocacia/";
+const instaGrid = document.getElementById("insta-grid");
+
+function instaFallback() {
+  // Sem token configurado ou rodando localmente: mostra um convite para o perfil
+  instaGrid.classList.add("insta-empty");
+  instaGrid.innerHTML = "";
+  const a = document.createElement("a");
+  a.href = INSTAGRAM_URL;
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.className = "insta-cta";
+  a.innerHTML =
+    '<img src="assets/img/lisiane-retrato.jpg" alt="" loading="lazy" />' +
+    "<span><strong>Dicas, direitos e novidades toda semana</strong>" +
+    "<small>Acompanhe @lisianesedrezadvocacia no Instagram →</small></span>";
+  instaGrid.appendChild(a);
+}
+
+async function loadInstagram() {
+  try {
+    const r = await fetch("/api/instagram?limit=6");
+    if (!r.ok) throw new Error(r.status);
+    const { posts } = await r.json();
+    if (!posts || !posts.length) throw new Error("vazio");
+
+    instaGrid.innerHTML = "";
+    posts.forEach((p) => {
+      const a = document.createElement("a");
+      a.className = "insta-post";
+      a.href = p.link;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.setAttribute("aria-label", p.caption ? `Post: ${p.caption.slice(0, 80)}` : "Post no Instagram");
+
+      const img = document.createElement("img");
+      img.src = p.image;
+      img.alt = "";
+      img.loading = "lazy";
+      a.appendChild(img);
+
+      if (p.type === "VIDEO" || p.type === "CAROUSEL_ALBUM") {
+        const badge = document.createElement("span");
+        badge.className = "insta-badge";
+        badge.textContent = p.type === "VIDEO" ? "▶" : "❐";
+        a.appendChild(badge);
+      }
+
+      const cap = document.createElement("span");
+      cap.className = "insta-caption";
+      cap.textContent = p.caption || "Ver no Instagram";
+      a.appendChild(cap);
+
+      instaGrid.appendChild(a);
+    });
+  } catch {
+    instaFallback();
+  }
+}
+loadInstagram();
+
+// ============================================================
 // Animações de entrada ao rolar
 // ============================================================
 const io = new IntersectionObserver(
