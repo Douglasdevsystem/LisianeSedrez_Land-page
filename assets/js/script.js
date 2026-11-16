@@ -4,7 +4,7 @@
 // Link oficial de mensagem do WhatsApp Business (todos os botões usam este link)
 const WHATSAPP_LINK = "https://wa.me/message/MIWH2KFDYFC5F1";
 // Número exibido no site
-const WHATSAPP_DISPLAY = "+55 53 9 915-4294";
+const WHATSAPP_DISPLAY = "+55 53 99155-4294";
 
 // Links wa.me/message não aceitam texto pré-preenchido, então todos abrem o mesmo link
 const waLink = () => WHATSAPP_LINK;
