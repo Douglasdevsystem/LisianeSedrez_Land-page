@@ -1,0 +1,7 @@
+# Arquivos locais (não vão para o repositório)
+_versao-anterior/
+.vercel/
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/

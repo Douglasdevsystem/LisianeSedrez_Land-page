@@ -1,0 +1,219 @@
+// ============================================================
+// CONFIGURAÇÃO: troque pelo WhatsApp real (DDI + DDD + número, só dígitos)
+// ============================================================
+const WHATSAPP = "5553000000000";
+
+const waLink = (msg) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+
+// Liga todos os links com data-whats ao WhatsApp
+document.querySelectorAll("[data-whats]").forEach((el) => {
+  el.href = waLink(el.dataset.whats);
+  el.target = "_blank";
+  el.rel = "noopener";
+});
+
+// Exibe o telefone formatado a partir do número configurado
+const phone = WHATSAPP.replace(/^55/, "");
+document.querySelectorAll(".js-phone").forEach((el) => {
+  el.textContent = `(${phone.slice(0, 2)}) ${phone.slice(2, 7)}-${phone.slice(7)}`;
+});
+
+// ============================================================
+// Menu mobile
+// ============================================================
+const toggle = document.querySelector(".menu-toggle");
+const menu = document.getElementById("menu");
+toggle.addEventListener("click", () => {
+  const open = menu.classList.toggle("open");
+  toggle.setAttribute("aria-expanded", open);
+});
+menu.querySelectorAll("a").forEach((a) =>
+  a.addEventListener("click", () => {
+    menu.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  })
+);
+
+// ============================================================
+// Abas de situações
+// ============================================================
+const SITUACOES = [
+  {
+    id: "trabalhador",
+    icon: "⚒",
+    label: "Trabalhador",
+    title: "Seus direitos trabalhistas, explicados e defendidos",
+    intro: "Para quem saiu (ou ainda está) em um emprego e sente que algo não foi pago ou respeitado.",
+    pains: [
+      "Rescisão paga com valores que você não entende",
+      "Horas extras e adicional noturno sem pagamento",
+      "Trabalho sem carteira assinada",
+      "FGTS sem depósito ou multa de 40% não paga",
+    ],
+    services: [
+      ["Revisão de rescisão", "Conferência de cada verba recebida no desligamento."],
+      ["Horas extras", "Jornada, intervalos, banco de horas e adicional noturno."],
+      ["Vínculo de emprego", "Reconhecimento de carteira assinada e direitos do período."],
+      ["Insalubridade e periculosidade", "Adicionais por exposição a riscos no trabalho."],
+    ],
+    msg: "Olá, Dra. Lisiane! Tenho uma dúvida trabalhista e gostaria de agendar uma consulta.",
+  },
+  {
+    id: "aposentadoria",
+    icon: "◷",
+    label: "Aposentadoria",
+    title: "Planejamento e pedido de aposentadoria sem surpresas",
+    intro: "Saiba quando e como se aposentar com o melhor benefício possível dentro das regras atuais.",
+    pains: [
+      "Dúvidas sobre as regras de transição da reforma",
+      "Períodos de trabalho que não aparecem no CNIS",
+      "Tempo especial (insalubre) não reconhecido",
+      "Aposentadoria concedida com valor abaixo do esperado",
+    ],
+    services: [
+      ["Planejamento previdenciário", "Análise do histórico e da melhor regra para o seu caso."],
+      ["Pedido de aposentadoria", "Organização dos documentos e protocolo junto ao INSS."],
+      ["Aposentadoria especial", "Reconhecimento de períodos com exposição a agentes nocivos."],
+      ["Revisão de benefício", "Verificação de erros no cálculo do valor concedido."],
+    ],
+    msg: "Olá, Dra. Lisiane! Gostaria de uma orientação sobre aposentadoria.",
+  },
+  {
+    id: "incapacidade",
+    icon: "✚",
+    label: "Doença e INSS",
+    title: "Doente ou acidentado? Você não precisa enfrentar o INSS sozinho(a)",
+    intro: "Para quem não consegue trabalhar por motivo de saúde, ou teve um benefício negado ou cortado.",
+    pains: [
+      "Perícia do INSS negou o auxílio",
+      "Benefício cortado mesmo sem condições de voltar",
+      "Acidente de trabalho sem a devida estabilidade",
+      "Família com pessoa idosa ou com deficiência sem renda (BPC/LOAS)",
+    ],
+    services: [
+      ["Auxílio por incapacidade", "Pedido, recurso e ação para o antigo auxílio-doença."],
+      ["Aposentadoria por incapacidade", "Para casos de incapacidade permanente."],
+      ["BPC/LOAS", "Benefício assistencial a idosos e pessoas com deficiência."],
+      ["Pensão por morte", "Garantia do benefício aos dependentes."],
+    ],
+    msg: "Olá, Dra. Lisiane! Tive um problema com benefício do INSS e gostaria de ajuda.",
+  },
+  {
+    id: "empresas",
+    icon: "▣",
+    label: "Empresas",
+    title: "Assessoria jurídica para a sua empresa crescer com segurança",
+    intro: "Prevenção de passivos trabalhistas e suporte no dia a dia de pequenas e médias empresas.",
+    pains: [
+      "Insegurança na hora de contratar ou demitir",
+      "Reclamatórias trabalhistas sem defesa estruturada",
+      "Contratos e documentos internos desatualizados",
+      "Dúvidas recorrentes sem um jurídico de confiança",
+    ],
+    services: [
+      ["Assessoria preventiva", "Orientação contínua sobre rotinas e decisões trabalhistas."],
+      ["Defesa em reclamatórias", "Atuação em audiências, acordos e recursos."],
+      ["Contratos e documentos", "Contratos de trabalho, políticas internas e advertências."],
+      ["Treinamento de gestores", "Boas práticas para reduzir riscos com a equipe."],
+    ],
+    msg: "Olá, Dra. Lisiane! Gostaria de conhecer a assessoria jurídica para empresas.",
+  },
+];
+
+const STEPS = [
+  ["Conte o seu caso", "Pelo WhatsApp, sem compromisso."],
+  ["Análise dos documentos", "Presencial ou online."],
+  ["Orientação clara", "Você sabe exatamente o próximo passo."],
+];
+
+const tabsEl = document.querySelector(".tabs");
+const panelEl = document.getElementById("tab-panel");
+
+function renderPanel(s) {
+  panelEl.innerHTML = `
+    <div>
+      <h3>${s.title}</h3>
+      <p class="intro">${s.intro}</p>
+      <p class="panel-label">Situações comuns</p>
+      <ul class="pains">${s.pains.map((p) => `<li>${p}</li>`).join("")}</ul>
+      <p class="panel-label">Como posso ajudar</p>
+      <div class="services">
+        ${s.services.map(([t, d]) => `<div class="service"><strong>${t}</strong><small>${d}</small></div>`).join("")}
+      </div>
+    </div>
+    <aside class="panel-side">
+      <p class="panel-label">Como começar</p>
+      <ol class="mini-steps">
+        ${STEPS.map(([t, d]) => `<li><div><strong>${t}</strong><small>${d}</small></div></li>`).join("")}
+      </ol>
+      <a class="btn btn-gold" href="${waLink(s.msg)}" target="_blank" rel="noopener">Falar sobre ${s.label.toLowerCase()} →</a>
+    </aside>`;
+  // reinicia a animação de entrada
+  panelEl.style.animation = "none";
+  void panelEl.offsetWidth;
+  panelEl.style.animation = "";
+}
+
+SITUACOES.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.className = "tab";
+  b.type = "button";
+  b.role = "tab";
+  b.id = `tab-${s.id}`;
+  b.setAttribute("aria-controls", "tab-panel");
+  b.setAttribute("aria-selected", i === 0);
+  b.innerHTML = `<span class="tab-ico" aria-hidden="true">${s.icon}</span>${s.label}`;
+  b.addEventListener("click", () => {
+    tabsEl.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", t === b));
+    renderPanel(s);
+  });
+  tabsEl.appendChild(b);
+});
+renderPanel(SITUACOES[0]);
+
+// ============================================================
+// Checklist "Tenho direito?"
+// ============================================================
+const checks = document.querySelectorAll("#check-list input");
+const countEl = document.getElementById("check-count");
+const textEl = document.getElementById("check-text");
+const sendEl = document.getElementById("check-send");
+
+function updateChecklist() {
+  const sel = [...checks].filter((c) => c.checked).map((c) => c.value);
+  countEl.textContent = sel.length;
+  if (sel.length === 0) {
+    textEl.textContent = "Selecione os itens ao lado";
+    sendEl.setAttribute("aria-disabled", "true");
+    sendEl.href = "#";
+    return;
+  }
+  textEl.textContent =
+    sel.length === 1
+      ? "situação marcada. Vale a pena conversar sobre ela."
+      : "situações marcadas. Vale a pena analisar o seu caso.";
+  sendEl.removeAttribute("aria-disabled");
+  const msg = `Olá, Dra. Lisiane! Fiz o checklist no site e marquei:\n\n${sel.map((s) => `• ${s}`).join("\n")}\n\nGostaria de agendar uma análise.`;
+  sendEl.href = waLink(msg);
+  sendEl.target = "_blank";
+  sendEl.rel = "noopener";
+}
+checks.forEach((c) => c.addEventListener("change", updateChecklist));
+updateChecklist();
+
+// ============================================================
+// Animações de entrada ao rolar
+// ============================================================
+const io = new IntersectionObserver(
+  (entries) =>
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add("visible");
+        io.unobserve(e.target);
+      }
+    }),
+  { threshold: 0.12 }
+);
+document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+document.getElementById("year").textContent = new Date().getFullYear();
