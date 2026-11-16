@@ -1,21 +1,22 @@
 // ============================================================
-// CONFIGURAÇÃO: troque pelo WhatsApp real (DDI + DDD + número, só dígitos)
+// CONFIGURAÇÃO DO WHATSAPP
 // ============================================================
-const WHATSAPP = "5553000000000";
+// Link oficial de mensagem do WhatsApp Business (todos os botões usam este link)
+const WHATSAPP_LINK = "https://wa.me/message/MIWH2KFDYFC5F1";
+// Número exibido no site
+const WHATSAPP_DISPLAY = "+55 53 9 915-4294";
 
-const waLink = (msg) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+// Links wa.me/message não aceitam texto pré-preenchido, então todos abrem o mesmo link
+const waLink = () => WHATSAPP_LINK;
 
-// Liga todos os links com data-whats ao WhatsApp
 document.querySelectorAll("[data-whats]").forEach((el) => {
-  el.href = waLink(el.dataset.whats);
+  el.href = WHATSAPP_LINK;
   el.target = "_blank";
   el.rel = "noopener";
 });
 
-// Exibe o telefone formatado a partir do número configurado
-const phone = WHATSAPP.replace(/^55/, "");
 document.querySelectorAll(".js-phone").forEach((el) => {
-  el.textContent = `(${phone.slice(0, 2)}) ${phone.slice(2, 7)}-${phone.slice(7)}`;
+  el.textContent = WHATSAPP_DISPLAY;
 });
 
 // ============================================================
@@ -179,6 +180,8 @@ const countEl = document.getElementById("check-count");
 const textEl = document.getElementById("check-text");
 const sendEl = document.getElementById("check-send");
 
+let checklistMsg = "";
+
 function updateChecklist() {
   const sel = [...checks].filter((c) => c.checked).map((c) => c.value);
   countEl.textContent = sel.length;
@@ -186,6 +189,7 @@ function updateChecklist() {
     textEl.textContent = "Selecione os itens ao lado";
     sendEl.setAttribute("aria-disabled", "true");
     sendEl.href = "#";
+    checklistMsg = "";
     return;
   }
   textEl.textContent =
@@ -193,11 +197,36 @@ function updateChecklist() {
       ? "situação marcada. Vale a pena conversar sobre ela."
       : "situações marcadas. Vale a pena analisar o seu caso.";
   sendEl.removeAttribute("aria-disabled");
-  const msg = `Olá, Dra. Lisiane! Fiz o checklist no site e marquei:\n\n${sel.map((s) => `• ${s}`).join("\n")}\n\nGostaria de agendar uma análise.`;
-  sendEl.href = waLink(msg);
+  checklistMsg = `Olá, Dra. Lisiane! Fiz o checklist no site e marquei:\n\n${sel.map((s) => `• ${s}`).join("\n")}\n\nGostaria de agendar uma análise.`;
+  sendEl.href = WHATSAPP_LINK;
   sendEl.target = "_blank";
   sendEl.rel = "noopener";
 }
+
+// Ao enviar, copia o resumo do checklist para a pessoa colar na conversa
+sendEl.addEventListener("click", () => {
+  if (!checklistMsg) return;
+  try {
+    navigator.clipboard.writeText(checklistMsg).then(() =>
+      showToast("Resumo copiado! Cole na conversa do WhatsApp.")
+    );
+  } catch {}
+});
+
+function showToast(text) {
+  let t = document.querySelector(".toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.className = "toast";
+    t.setAttribute("role", "status");
+    document.body.appendChild(t);
+  }
+  t.textContent = text;
+  t.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => t.classList.remove("show"), 4500);
+}
+
 checks.forEach((c) => c.addEventListener("change", updateChecklist));
 updateChecklist();
 

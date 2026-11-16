@@ -29,7 +29,7 @@ python -m http.server 5500
 
 ## Configuração
 
-- **WhatsApp:** altere a constante `WHATSAPP` no início de `assets/js/script.js` (formato `55` + DDD + número, só dígitos). Todos os botões usam esse número.
+- **WhatsApp:** no início de `assets/js/script.js`, `WHATSAPP_LINK` é o link usado por todos os botões e `WHATSAPP_DISPLAY` é o número exibido no site. No checklist, o resumo é copiado para a pessoa colar na conversa.
 - **OAB:** inclua o número de inscrição na seção "Sobre" do `index.html` (há um comentário marcando o local).
 
 ## Feed automático do Instagram
